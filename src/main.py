@@ -1,4 +1,5 @@
 import logging
+import threading
 from contextlib import asynccontextmanager
 # pyrefly: ignore [missing-import]
 from fastapi import FastAPI, Request, status
@@ -18,17 +19,31 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+def _load_cache_background():
+    """
+    Loads the dataset cache in a background thread so startup is not blocked.
+    Railway has strict startup timeouts — loading a large HuggingFace dataset
+    synchronously can exceed this limit and cause crash loops.
+    The /api/v1/health and /api/v1/recommend endpoints gracefully handle the
+    'cache not yet ready' state via is_cache_initialized() checks.
+    """
+    logger.info("Background thread: starting dataset cache initialization...")
+    try:
+        initialize_cache()
+        logger.info("Background thread: dataset cache initialized successfully.")
+    except Exception as e:
+        logger.critical(f"Background thread: CRITICAL ERROR loading dataset: {e}")
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     """
-    FastAPI lifespan logic to handle startup initialization of the cached dataset.
+    FastAPI lifespan: kicks off dataset loading in a background thread so
+    the server binds its port immediately (satisfying Railway's health check),
+    while the dataset continues loading asynchronously.
     """
-    logger.info("Initializing restaurant database cache on application startup...")
-    try:
-        initialize_cache()
-        logger.info("Restaurant database cache initialized successfully.")
-    except Exception as e:
-        logger.critical(f"CRITICAL ERROR: Failed to load dataset at startup: {e}")
+    logger.info("Application startup: launching background cache loader...")
+    thread = threading.Thread(target=_load_cache_background, daemon=True)
+    thread.start()
     yield
 
 app = FastAPI(
