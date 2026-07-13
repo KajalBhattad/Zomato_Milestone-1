@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html class="dark" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>Zomato AI Dashboard</title>
+    <!-- SEO Meta Tags -->
+    <meta name="description" content="AI-Powered Restaurant Recommendation System based on the Zomato dataset, offering personalized recommendations with Llama 3."/>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;900&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+    
+    <script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-secondary-container": "#b7b5b4",
+                        "primary": "#ffb3b1",
+                        "secondary-fixed-dim": "#c8c6c5",
+                        "surface-bright": "#393939",
+                        "on-tertiary-fixed-variant": "#474746",
+                        "tertiary-container": "#929090",
+                        "surface-variant": "#353534",
+                        "secondary-fixed": "#e5e2e1",
+                        "on-error-container": "#ffdad6",
+                        "outline": "#ab8987",
+                        "surface-container-highest": "#353534",
+                        "on-primary-fixed": "#410007",
+                        "on-primary-container": "#5b000e",
+                        "surface-container-low": "#1c1b1b",
+                        "secondary": "#c8c6c5",
+                        "secondary-container": "#474746",
+                        "on-secondary": "#303030",
+                        "on-tertiary-fixed": "#1b1c1c",
+                        "on-secondary-fixed": "#1b1b1c",
+                        "outline-variant": "#5b403f",
+                        "on-background": "#e5e2e1",
+                        "error": "#ffb4ab",
+                        "surface-container-lowest": "#0e0e0e",
+                        "surface-dim": "#131313",
+                        "on-secondary-fixed-variant": "#474746",
+                        "surface": "#131313",
+                        "surface-container": "#201f1f",
+                        "inverse-primary": "#bb162c",
+                        "primary-fixed-dim": "#ffb3b1",
+                        "tertiary-fixed": "#e4e2e1",
+                        "primary-container": "#ff535a",
+                        "on-tertiary": "#303030",
+                        "tertiary-fixed-dim": "#c8c6c6",
+                        "on-primary": "#680011",
+                        "surface-tint": "#ffb3b1",
+                        "on-surface-variant": "#e4bebc",
+                        "on-tertiary-container": "#2a2a2a",
+                        "on-error": "#690005",
+                        "tertiary": "#c8c6c6",
+                        "primary-fixed": "#ffdad8",
+                        "on-surface": "#e5e2e1",
+                        "inverse-on-surface": "#313030",
+                        "background": "#131313",
+                        "error-container": "#93000a",
+                        "surface-container-high": "#2a2a2a",
+                        "on-primary-fixed-variant": "#92001c",
+                        "inverse-surface": "#e5e2e1"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "spacing": {
+                        "container_max_width": "1440px",
+                        "base_unit": "8px",
+                        "margin_desktop": "40px",
+                        "gutter": "24px",
+                        "margin_mobile": "16px"
+                    },
+                    "fontFamily": {
+                        "headline-lg": ["Outfit"],
+                        "headline-lg-mobile": ["Outfit"],
+                        "display-lg": ["Outfit"],
+                        "body-lg": ["Inter"],
+                        "body-md": ["Inter"],
+                        "headline-md": ["Outfit"],
+                        "label-sm": ["Inter"],
+                        "label-md": ["Inter"]
+                    },
+                    "fontSize": {
+                        "headline-lg": ["32px", {"lineHeight": "40px", "letterSpacing": "-0.01em", "fontWeight": "600"}],
+                        "headline-lg-mobile": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "display-lg": ["48px", {"lineHeight": "56px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "600"}],
+                        "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.01em", "fontWeight": "500"}]
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom scrollbar for webkit */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #131313;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #353534;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #474746;
+        }
+
+        /* Tonal Elevation Levels */
+        .elevation-0 { background-color: #121212; }
+        .elevation-1 { background-color: #1E1E1E; border: 1px solid #2D2D2D; }
+        .elevation-2 { background-color: #2D2D2D; box-shadow: inset 0 1px 0 rgba(255,255,255,0.1); }
+
+        /* Specific Brand Overrides */
+        .zomato-red { background-color: #E23744; }
+        .zomato-red-text { color: #E23744; }
+        
+        .smooth-transition { transition: all 200ms cubic-bezier(0.4, 0, 0.2, 1); }
+        .scrollbar-hide::-webkit-scrollbar { display: none; }
+        .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface font-body-md h-screen overflow-hidden flex flex-col md:flex-row">
+
+    <!-- Shared Navigation Component: SideNavBar -->
+    <nav class="hidden md:flex flex-col h-full py-base_unit px-2 bg-surface border-r border-outline-variant w-20 sticky left-0 top-0">
+        <div class="mb-8 mt-4 px-1 flex flex-col items-center">
+            <h1 class="font-headline-md text-headline-md font-bold text-primary mb-1 text-center" title="Zomato AI">Z</h1>
+            <p class="font-label-sm text-label-sm text-on-surface-variant flex items-center justify-center gap-1" id="healthStatus">
+                <span class="w-2 h-2 rounded-full bg-yellow-500 animate-pulse" id="healthIndicator"></span> 
+                <span id="healthText" class="hidden">Connecting...</span>
+            </p>
+        </div>
+        <ul class="flex flex-col gap-3 flex-grow items-center">
+            <li class="w-full flex justify-center">
+                <a class="flex items-center justify-center p-3 rounded-lg text-primary font-bold border-r-2 border-primary hover:bg-surface-container-high transition-colors opacity-80 duration-200" href="#" title="Discover">
+                    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">explore</span>
+                    <span class="font-label-md text-label-md hidden">Discover</span>
+                </a>
+            </li>
+            <li class="w-full flex justify-center">
+                <a class="flex items-center justify-center p-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-colors" href="#" onclick="alert('History is not available in Milestone 1')" title="History">
+                    <span class="material-symbols-outlined">history</span>
+                    <span class="font-label-md text-label-md hidden">History</span>
+                </a>
+            </li>
+            <li class="w-full flex justify-center">
+                <a class="flex items-center justify-center p-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-colors" href="#" onclick="alert('Favorites is not available in Milestone 1')" title="Favorites">
+                    <span class="material-symbols-outlined">favorite</span>
+                    <span class="font-label-md text-label-md hidden">Favorites</span>
+                </a>
+            </li>
+            <li class="w-full flex justify-center">
+                <a class="flex items-center justify-center p-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-colors" href="#" onclick="alert('Map View is not available in Milestone 1')" title="Map View">
+                    <span class="material-symbols-outlined">map</span>
+                    <span class="font-label-md text-label-md hidden">Map View</span>
+                </a>
+            </li>
+            <li class="w-full flex justify-center">
+                <a class="flex items-center justify-center p-3 rounded-lg text-on-surface-variant hover:bg-surface-container-high transition-colors" href="#" onclick="alert('Analytics is not available in Milestone 1')" title="Analytics">
+                    <span class="material-symbols-outlined">monitoring</span>
+                    <span class="font-label-md text-label-md hidden">Analytics</span>
+                </a>
+            </li>
+        </ul>
+        <div class="mt-auto mb-4 px-1 flex justify-center w-full">
+            <button class="w-12 h-12 flex items-center justify-center rounded-lg bg-surface-container-high text-on-surface border border-outline-variant hover:border-primary transition-colors" onclick="resetForm()" title="New Search">
+                <span class="material-symbols-outlined text-primary">add</span>
+            </button>
+        </div>
+    </nav>
+
+
+    <!-- Split Screen Layout -->
+    <div class="flex-grow flex h-full flex-col md:flex-row overflow-hidden">
+        
+        <!-- Left Column: Preferences Form (35%) -->
+        <aside class="w-full md:w-[35%] h-1/2 md:h-full flex flex-col border-b md:border-b-0 md:border-r border-outline-variant bg-surface-container-lowest p-6 overflow-y-auto">
+            <div class="mb-6">
+                <h2 class="font-headline-lg text-headline-lg font-bold mb-2"><span class="zomato-red-text">Zomato AI</span> •</h2>
+                <p class="text-on-surface-variant font-body-md">Configure your culinary parameters for precise AI recommendations.</p>
+            </div>
+            
+            <form class="flex flex-col gap-5 flex-grow" id="preferencesForm">
+                
+                <!-- Searchable Location Dropdown -->
+                <div class="flex flex-col gap-2 relative">
+                    <label class="font-label-md text-label-md text-on-surface" for="locationInput">Location *</label>
+                    <div class="relative flex items-center w-full">
+                        <span class="material-symbols-outlined absolute left-4 text-on-surface-variant z-10">location_on</span>
+                        <input id="locationInput" type="text" class="w-full pl-11 pr-10 py-3 bg-[#1E1E1E] border border-[#2D2D2D] rounded-full text-on-surface focus:outline-none focus:border-[#E23744] focus:ring-1 focus:ring-[#E23744] font-body-md placeholder-on-surface-variant transition-colors" placeholder="Search location... (e.g. Indiranagar)" autocomplete="off" required/>
+                        <button type="button" id="clearLocationBtn" class="absolute right-4 text-on-surface-variant hover:text-on-surface hidden z-10">
+                            <span class="material-symbols-outlined text-[20px]">close</span>
+                        </button>
+                    </div>
+                    <!-- Dropdown List -->
+                    <ul id="locationList" class="absolute left-0 right-0 top-[82px] max-h-60 overflow-y-auto bg-[#1E1E1E] border border-[#2D2D2D] rounded-xl shadow-2xl z-30 hidden divide-y divide-[#282828]">
+                        <!-- Populated dynamically by JS -->
+                    </ul>
+                </div>
+
+                <!-- Cuisine Selector -->
+                <div class="flex flex-col gap-2">
+                    <label class="font-label-md text-label-md text-on-surface">Cuisine (Optional)</label>
+                    <div class="flex gap-2 overflow-x-auto pb-2 scrollbar-hide" id="cuisineContainer">
+                        <!-- Populated dynamically by JS -->
+                    </div>
+                </div>
+
+                <!-- Budget Segmented Buttons -->
+                <div class="flex flex-col gap-2">
+                    <label class="font-label-md text-label-md text-on-surface">Budget Range</label>
+                    <div class="flex bg-[#1E1E1E] p-1 rounded-lg border border-[#2D2D2D]" id="budgetGroup">
+                        <button class="flex-1 py-2 text-center rounded-md text-on-surface-variant font-label-md hover:text-on-surface transition-colors duration-150" type="button" data-budget="low">100 - 500 Rs.</button>
+                        <button class="flex-1 py-2 text-center rounded-md bg-[#2D2D2D] text-white font-label-md shadow-sm transition-colors duration-150" type="button" data-budget="medium">500 - 1500 Rs.</button>
+                        <button class="flex-1 py-2 text-center rounded-md text-on-surface-variant font-label-md hover:text-on-surface transition-colors duration-150" type="button" data-budget="high">1500 - 2000 Rs.+</button>
+                    </div>
+                </div>
+
+                <!-- Minimum Rating Slider -->
+                <div class="flex flex-col gap-2">
+                    <div class="flex justify-between items-center">
+                        <label class="font-label-md text-label-md text-on-surface" for="ratingSlider">Minimum Rating</label>
+                        <span class="font-label-md text-label-md font-bold text-primary" id="ratingValue">0.0+</span>
+                    </div>
+                    <input id="ratingSlider" class="w-full h-2 bg-[#2D2D2D] rounded-lg appearance-none cursor-pointer accent-[#E23744]" max="5" min="0" step="0.1" type="range" value="0.0"/>
+                </div>
+
+                <!-- Natural Language Preferences -->
+                <div class="flex flex-col gap-2">
+                    <label class="font-label-md text-label-md text-on-surface" for="additionalPreferences">Specific Preferences (Optional)</label>
+                    <div class="relative">
+                        <textarea id="additionalPreferences" class="w-full p-4 bg-[#1E1E1E] border border-[#2D2D2D] rounded-xl text-on-surface focus:outline-none focus:border-[#E23744] focus:ring-1 focus:ring-[#E23744] font-body-md placeholder-on-surface-variant transition-colors resize-none" placeholder="Describe what you're craving... e.g., 'Quiet place with good filter coffee and crispy dosa.'" rows="3" maxlength="200"></textarea>
+                        <div class="absolute bottom-2 right-3 text-xs text-on-surface-variant" id="charCounter">0/200</div>
+                    </div>
+                </div>
+
+                <div class="mt-auto pt-4 pb-2">
+                    <button class="w-full py-4 rounded-xl zomato-red text-white font-headline-md text-label-md font-bold hover:bg-red-700 transition-colors flex justify-center items-center gap-2 group relative overflow-hidden" id="generateBtn" type="submit">
+                        <span class="relative z-10 flex items-center gap-2" id="btnLabel">
+                            <span class="material-symbols-outlined">auto_awesome</span>
+                            Generate Recommendations
+                        </span>
+                        <div class="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 transition-opacity z-0"></div>
+                        <!-- Spinner (hidden by default) -->
+                        <span class="material-symbols-outlined animate-spin hidden relative z-10" id="spinner">progress_activity</span>
+                    </button>
+                </div>
+            </form>
+        </aside>
+
+        <!-- Right Column: Main Content (65%) -->
+        <main class="w-full md:w-[65%] h-1/2 md:h-full bg-surface p-6 overflow-y-auto relative flex flex-col">
+            
+            <!-- Top App Bar (Model & Status) -->
+            <div class="hidden justify-end items-center mb-6 bg-surface/90 backdrop-blur-sm py-2 z-20 sticky top-0">
+                <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface-container-high border border-outline-variant">
+                        <span class="w-2.5 h-2.5 rounded-full bg-green-500" id="modelStatusDot"></span>
+                        <span class="font-label-sm text-label-sm text-on-surface-variant" id="modelName">Model: Llama-3 (Groq AI)</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="max-w-4xl mx-auto w-full flex-grow flex flex-col gap-6 pb-12" id="resultsContent">
+                
+                <!-- Initial Welcome State (displayed on load) -->
+                <div class="flex-grow flex flex-col items-center justify-center text-center p-8 my-auto" id="welcomeState">
+                    <div class="w-20 h-20 rounded-full bg-[#1E1E1E] border border-[#2D2D2D] flex items-center justify-center text-[#E23744] mb-6">
+                        <span class="material-symbols-outlined text-4xl">auto_awesome</span>
+                    </div>
+                    <h3 class="font-headline-md text-headline-md text-on-surface mb-2">Welcome to Zomato AI Recommendations</h3>
+                    <p class="text-on-surface-variant max-w-md font-body-md">Configure your location, budget, and cravings on the left, then click Generate. Zomato AI will filter the records and rank the top recommendations for you.</p>
+                </div>
+
+                <!-- Skeleton Loading State (hidden by default) -->
+                <div class="hidden flex-col gap-6" id="loadingState">
+                    <div class="p-6 rounded-2xl bg-surface-container-lowest border border-outline-variant animate-pulse">
+                        <div class="h-6 bg-[#2D2D2D] rounded w-1/3 mb-4"></div>
+                        <div class="h-4 bg-[#2D2D2D] rounded w-3/4"></div>
+                    </div>
+                    <div class="grid grid-cols-1 xl:grid-cols-2 gap-6">
+                        <!-- Skeleton Card 1 -->
+                        <div class="elevation-1 rounded-xl overflow-hidden h-72 animate-pulse flex flex-col">
+                            <div class="h-20 bg-gradient-to-r from-[#1A1A1A] to-[#2A2A2A] p-4 flex items-center justify-between border-b border-[#2D2D2D]">
+                                <div class="h-10 bg-[#353534] rounded w-1/2"></div>
+                                <div class="h-8 bg-[#353534] rounded w-12"></div>
+                            </div>
+                            <div class="p-5 flex-grow flex flex-col gap-4 bg-[#1E1E1E]">
+                                <div class="h-5 bg-[#2D2D2D] rounded w-3/4"></div>
+                                <div class="h-4 bg-[#2D2D2D] rounded w-1/2"></div>
+                                <div class="h-16 bg-[#181818] rounded-lg w-full mt-2"></div>
+                            </div>
+                        </div>
+                        <!-- Skeleton Card 2 -->
+                        <div class="elevation-1 rounded-xl overflow-hidden h-72 animate-pulse flex flex-col">
+                            <div class="h-20 bg-gradient-to-r from-[#1A1A1A] to-[#2A2A2A] p-4 flex items-center justify-between border-b border-[#2D2D2D]">
+                                <div class="h-10 bg-[#353534] rounded w-1/2"></div>
+                                <div class="h-8 bg-[#353534] rounded w-12"></div>
+                            </div>
+                            <div class="p-5 flex-grow flex flex-col gap-4 bg-[#1E1E1E]">
+                                <div class="h-5 bg-[#2D2D2D] rounded w-2/3"></div>
+                                <div class="h-4 bg-[#2D2D2D] rounded w-1/3"></div>
+                                <div class="h-16 bg-[#181818] rounded-lg w-full mt-2"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Empty State (hidden by default) -->
+                <div class="hidden flex-col items-center justify-center text-center p-8 my-auto" id="emptyState">
+                    <div class="w-16 h-16 rounded-full bg-[#1E1E1E] border border-[#2D2D2D] flex items-center justify-center text-amber-500 mb-4">
+                        <span class="material-symbols-outlined text-3xl">search_off</span>
+                    </div>
+                    <h3 class="font-headline-md text-headline-md text-on-surface mb-2">No Matching Restaurants</h3>
+                    <p class="text-on-surface-variant max-w-md font-body-md mb-4" id="emptyStateMsg">We couldn't find any restaurants matching your filters. Try widening your criteria or looking in a nearby location.</p>
+                    <button class="px-5 py-2.5 rounded-lg border border-[#2D2D2D] hover:border-primary text-on-surface transition-colors font-label-md" onclick="resetFilters()">Clear Filters</button>
+                </div>
+
+                <!-- Error State (hidden by default) -->
+                <div class="hidden flex-col items-center justify-center text-center p-8 my-auto" id="errorState">
+                    <div class="w-16 h-16 rounded-full bg-[#1E1E1E] border border-[#2D2D2D] flex items-center justify-center text-[#E23744] mb-4">
+                        <span class="material-symbols-outlined text-3xl">warning</span>
+                    </div>
+                    <h3 class="font-headline-md text-headline-md text-on-surface mb-2">Recommendation Engine Error</h3>
+                    <p class="text-on-surface-variant max-w-md font-body-md mb-4" id="errorStateMsg">There was a problem communicating with the recommendation backend. Please check your network connection or API keys.</p>
+                    <button class="px-5 py-2.5 rounded-lg bg-[#1E1E1E] border border-[#2D2D2D] hover:border-primary text-on-surface transition-colors font-label-md" onclick="retrySearch()">Retry</button>
+                </div>
+
+                <!-- AI Summary Header (hidden by default) -->
+                <div class="p-6 rounded-2xl bg-surface-container-lowest border border-outline-variant relative overflow-hidden hidden" id="summaryHeader">
+                    <div class="absolute inset-0 border-2 border-transparent rounded-2xl" style="background: linear-gradient(to right, #131313, #131313) padding-box, linear-gradient(to right, #E23744, #1E1E1E) border-box;"></div>
+                    <div class="relative z-10 flex items-start gap-4">
+                        <div class="p-3 rounded-full bg-[#1E1E1E] border border-[#2D2D2D] text-primary">
+                            <span class="material-symbols-outlined text-3xl">insights</span>
+                        </div>
+                        <div>
+                            <h3 class="font-headline-md text-headline-md text-on-surface mb-2" id="summaryTitle">Curated for you</h3>
+                            <p class="font-body-md text-body-md text-on-surface-variant" id="summaryText">Recommendations summary will render here.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Results Grid (hidden by default) -->
+                <div class="grid grid-cols-1 xl:grid-cols-2 gap-6 hidden" id="recommendationGrid">
+                    <!-- Populated dynamically by JS -->
+                </div>
+
+            </div>
+        </main>
+    </div>
+
+    <!-- JavaScript logic -->
+    <script>
+        // Bengaluru locations list extracted from dataset
+        const locations = [
+            'BTM', 'Banashankari', 'Banaswadi', 'Bannerghatta Road', 'Basavanagudi', 
+            'Basaveshwara Nagar', 'Bellandur', 'Bommanahalli', 'Brigade Road', 
+            'Brookefield', 'CV Raman Nagar', 'Central Bangalore', 'Church Street', 
+            'City Market', 'Commercial Street', 'Cunningham Road', 'Domlur', 
+            'East Bangalore', 'Ejipura', 'Electronic City', 'Frazer Town', 
+            'HBR Layout', 'HSR', 'Hebbal', 'Hennur', 'Hosur Road', 
+            'ITPL Main Road, Whitefield', 'Indiranagar', 'Infantry Road', 'JP Nagar', 
+            'Jakkur', 'Jalahalli', 'Jayanagar', 'Jeevan Bhima Nagar', 'KR Puram', 
+            'Kaggadasapura', 'Kalyan Nagar', 'Kammanahalli', 'Kanakapura Road', 
+            'Kengeri', 'Koramangala', 'Koramangala 1st Block', 'Koramangala 2nd Block', 
+            'Koramangala 3rd Block', 'Koramangala 4th Block', 'Koramangala 5th Block', 
+            'Koramangala 6th Block', 'Koramangala 7th Block', 'Koramangala 8th Block', 
+            'Kumaraswamy Layout', 'Langford Town', 'Lavelle Road', 'MG Road', 
+            'Magadi Road', 'Majestic', 'Malleshwaram', 'Marathahalli', 'Mysore Road', 
+            'Nagarbhavi', 'Nagawara', 'New BEL Road', 'North Bangalore', 
+            'Old Airport Road', 'Old Madras Road', 'Peenya', 'RT Nagar', 
+            'Race Course Road', 'Rajajinagar', 'Rajarajeshwari Nagar', 'Rammurthy Nagar', 
+            'Residency Road', 'Richmond Road', 'Sadashiv Nagar', 'Sahakara Nagar', 
+            'Sanjay Nagar', 'Sankey Road', 'Sarjapur Road', 'Seshadripuram', 
+            'Shanti Nagar', 'Shivajinagar', 'South Bangalore', 'St. Marks Road', 
+            'Thippasandra', 'Ulsoor', 'Uttarahalli', 'Varthur Main Road, Whitefield', 
+            'Vasanth Nagar', 'Vijay Nagar', 'West Bangalore', 'Whitefield', 
+            'Wilson Garden', 'Yelahanka', 'Yeshwantpur'
+        ];
+
+        // Top Cuisines list
+        const commonCuisines = [
+            'North Indian', 'Chinese', 'South Indian', 'Fast Food', 'Biryani', 
+            'Continental', 'Desserts', 'Cafe', 'Beverages', 'Italian', 'Pizza', 'Seafood'
+        ];
+
+        // UI State
+        let selectedCuisine = null;
+        let selectedBudget = 'medium';
+
+        // DOM elements
+        const locationInput = document.getElementById('locationInput');
+        const locationList = document.getElementById('locationList');
+        const clearLocationBtn = document.getElementById('clearLocationBtn');
+        const cuisineContainer = document.getElementById('cuisineContainer');
+        const budgetGroup = document.getElementById('budgetGroup');
+        const ratingSlider = document.getElementById('ratingSlider');
+        const ratingValue = document.getElementById('ratingValue');
+        const additionalPreferences = document.getElementById('additionalPreferences');
+        const charCounter = document.getElementById('charCounter');
+        
+        // Form & Button state
+        const preferencesForm = document.getElementById('preferencesForm');
+        const generateBtn = document.getElementById('generateBtn');
+        const btnLabel = document.getElementById('btnLabel');
+        const spinner = document.getElementById('spinner');
+
+        // Results elements
+        const welcomeState = document.getElementById('welcomeState');
+        const loadingState = document.getElementById('loadingState');
+        const emptyState = document.getElementById('emptyState');
+        const emptyStateMsg = document.getElementById('emptyStateMsg');
+        const errorState = document.getElementById('errorState');
+        const errorStateMsg = document.getElementById('errorStateMsg');
+        const summaryHeader = document.getElementById('summaryHeader');
+        const summaryTitle = document.getElementById('summaryTitle');
+        const summaryText = document.getElementById('summaryText');
+        const recommendationGrid = document.getElementById('recommendationGrid');
+
+        // Health Status Elements
+        const healthIndicator = document.getElementById('healthIndicator');
+        const healthText = document.getElementById('healthText');
+        const modelStatusDot = document.getElementById('modelStatusDot');
+        const modelName = document.getElementById('modelName');
+
+        // Page Load initialization
+        window.addEventListener('DOMContentLoaded', () => {
+            initializeCuisines();
+            initializeBudget();
+            initializeLocationDropdown();
+            checkApiHealth();
+            
+            // Slider interaction
+            ratingSlider.addEventListener('input', (e) => {
+                ratingValue.textContent = `${parseFloat(e.target.value).toFixed(1)}+`;
+            });
+
+            // Character counter for preferences
+            additionalPreferences.addEventListener('input', (e) => {
+                charCounter.textContent = `${e.target.value.length}/200`;
+            });
+
+            // Form Submit handler
+            preferencesForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                performRecommendationSearch();
+            });
+        });
+
+        // Check backend health
+        async function checkApiHealth() {
+            try {
+                const response = await fetch('/api/v1/health');
+                const data = await response.json();
+                
+                if (data.status === 'healthy') {
+                    healthIndicator.className = 'w-2 h-2 rounded-full bg-green-500';
+                    healthText.textContent = 'API Connected';
+                    modelStatusDot.className = 'w-2.5 h-2.5 rounded-full bg-green-500 animate-pulse';
+                    modelName.textContent = data.groq_configured ? 'Model: Llama 3 (Groq AI)' : 'Model: Local Filter (Offline)';
+                } else if (data.status === 'degraded') {
+                    healthIndicator.className = 'w-2 h-2 rounded-full bg-yellow-500 animate-pulse';
+                    healthText.textContent = 'API Degraded';
+                    modelStatusDot.className = 'w-2.5 h-2.5 rounded-full bg-yellow-500';
+                    modelName.textContent = 'Model: Local Filter (Fallback)';
+                } else {
+                    healthIndicator.className = 'w-2 h-2 rounded-full bg-[#E23744]';
+                    healthText.textContent = 'API Offline';
+                    modelStatusDot.className = 'w-2.5 h-2.5 rounded-full bg-[#E23744]';
+                    modelName.textContent = 'Model: Connection Failed';
+                }
+            } catch (err) {
+                console.error("Health check failed:", err);
+                healthIndicator.className = 'w-2 h-2 rounded-full bg-[#E23744]';
+                healthText.textContent = 'API Disconnected';
+                modelStatusDot.className = 'w-2.5 h-2.5 rounded-full bg-[#E23744]';
+                modelName.textContent = 'Model: Connection Offline';
+            }
+        }
+
+        // Initialize locations dropdown logic
+        function initializeLocationDropdown() {
+            // Function to render dropdown list based on query
+            function renderDropdown(query = '') {
+                const filtered = locations.filter(loc => 
+                    loc.toLowerCase().includes(query.toLowerCase())
+                );
+                
+                locationList.innerHTML = '';
+                if (filtered.length === 0) {
+                    const li = document.createElement('li');
+                    li.className = 'px-4 py-3 text-on-surface-variant text-sm italic';
+                    li.textContent = 'No locations match';
+                    locationList.appendChild(li);
+                } else {
+                    filtered.forEach(loc => {
+                        const li = document.createElement('li');
+                        li.className = 'px-4 py-3 text-on-surface hover:bg-[#252525] cursor-pointer text-sm font-body-md transition-colors';
+                        li.textContent = loc;
+                        li.addEventListener('mousedown', (e) => {
+                            e.preventDefault(); // Prevents blur event from firing before click is processed
+                            selectLocation(loc);
+                        });
+                        locationList.appendChild(li);
+                    });
+                }
+                locationList.classList.remove('hidden');
+            }
+
+            function selectLocation(loc) {
+                locationInput.value = loc;
+                locationList.classList.add('hidden');
+                clearLocationBtn.classList.remove('hidden');
+            }
+
+            // Input handlers
+            locationInput.addEventListener('focus', () => {
+                renderDropdown(locationInput.value);
+            });
+
+            locationInput.addEventListener('input', () => {
+                if (locationInput.value) {
+                    clearLocationBtn.classList.remove('hidden');
+                } else {
+                    clearLocationBtn.classList.add('hidden');
+                }
+                renderDropdown(locationInput.value);
+            });
+
+            locationInput.addEventListener('blur', () => {
+                // Delay hiding list to allow click events to register
+                setTimeout(() => {
+                    locationList.classList.add('hidden');
+                }, 200);
+            });
+
+            clearLocationBtn.addEventListener('click', () => {
+                locationInput.value = '';
+                clearLocationBtn.classList.add('hidden');
+                locationInput.focus();
+                renderDropdown();
+            });
+        }
+
+        // Initialize common cuisines as selectable chips
+        function initializeCuisines() {
+            cuisineContainer.innerHTML = '';
+            commonCuisines.forEach(cuisineName => {
+                const button = document.createElement('button');
+                button.className = 'whitespace-nowrap px-4 py-2 rounded-full border border-[#2D2D2D] bg-[#1E1E1E] text-on-surface hover:border-[#E23744] transition-colors font-label-sm duration-150';
+                button.type = 'button';
+                button.textContent = cuisineName;
+                
+                button.addEventListener('click', () => {
+                    if (selectedCuisine === cuisineName) {
+                        // Deselect
+                        selectedCuisine = null;
+                        button.className = 'whitespace-nowrap px-4 py-2 rounded-full border border-[#2D2D2D] bg-[#1E1E1E] text-on-surface hover:border-[#E23744] transition-colors font-label-sm duration-150';
+                    } else {
+                        // Deselect previous
+                        const currentActive = cuisineContainer.querySelector('.zomato-red');
+                        if (currentActive) {
+                            currentActive.className = 'whitespace-nowrap px-4 py-2 rounded-full border border-[#2D2D2D] bg-[#1E1E1E] text-on-surface hover:border-[#E23744] transition-colors font-label-sm duration-150';
+                        }
+                        // Select new
+                        selectedCuisine = cuisineName;
+                        button.className = 'whitespace-nowrap px-4 py-2 rounded-full border border-[#E23744] zomato-red text-white transition-colors font-label-sm duration-150';
+                    }
+                });
+                
+                cuisineContainer.appendChild(button);
+            });
+        }
+
+        // Initialize Budget select buttons
+        function initializeBudget() {
+            const buttons = budgetGroup.querySelectorAll('button');
+            buttons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    buttons.forEach(b => {
+                        b.className = 'flex-1 py-2 text-center rounded-md text-on-surface-variant font-label-md hover:text-on-surface transition-colors duration-150';
+                    });
+                    
+                    selectedBudget = btn.getAttribute('data-budget');
+                    btn.className = 'flex-1 py-2 text-center rounded-md bg-[#2D2D2D] text-white font-label-md shadow-sm transition-colors duration-150';
+                });
+            });
+        }
+
+        // Reset search inputs to initial state
+        function resetForm() {
+            locationInput.value = '';
+            clearLocationBtn.classList.add('hidden');
+            selectedCuisine = null;
+            initializeCuisines();
+            
+            // Set budget to medium
+            const mediumBudgetBtn = budgetGroup.querySelector('[data-budget="medium"]');
+            if (mediumBudgetBtn) mediumBudgetBtn.click();
+            
+            ratingSlider.value = 0.0;
+            ratingValue.textContent = '0.0+';
+            additionalPreferences.value = '';
+            charCounter.textContent = '0/200';
+            
+            // UI state
+            showSection(welcomeState);
+        }
+
+        // Clear filters helper in empty state
+        function resetFilters() {
+            selectedCuisine = null;
+            initializeCuisines();
+            ratingSlider.value = 0.0;
+            ratingValue.textContent = '0.0+';
+            additionalPreferences.value = '';
+            charCounter.textContent = '0/200';
+            
+            const mediumBudgetBtn = budgetGroup.querySelector('[data-budget="medium"]');
+            if (mediumBudgetBtn) mediumBudgetBtn.click();
+        }
+
+        function showSection(sectionToShow) {
+            welcomeState.classList.add('hidden');
+            loadingState.classList.add('hidden');
+            emptyState.classList.add('hidden');
+            errorState.classList.add('hidden');
+            summaryHeader.classList.add('hidden');
+            recommendationGrid.classList.add('hidden');
+
+            sectionToShow.classList.remove('hidden');
+            if (sectionToShow === recommendationGrid) {
+                summaryHeader.classList.remove('hidden');
+            }
+        }
+
+        // Run query execution
+        async function performRecommendationSearch() {
+            const location = locationInput.value.trim();
+            if (!location) {
+                alert("Please select a location.");
+                return;
+            }
+
+            // Show loading state
+            setLoading(true);
+            showSection(loadingState);
+
+            const payload = {
+                location: location,
+                budget: selectedBudget,
+                cuisine: selectedCuisine,
+                min_rating: parseFloat(ratingSlider.value),
+                additional_preferences: additionalPreferences.value.trim() || null
+            };
+
+            try {
+                const response = await fetch('/api/v1/recommend', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                if (response.status === 200) {
+                    const data = await response.json();
+                    renderRecommendations(data, payload);
+                } else if (response.status === 404) {
+                    const errorDetail = await response.json();
+                    emptyStateMsg.innerHTML = `Sorry :( We don't know any restaurants in <strong>${location}</strong> for this rating! 🍕🔍<br/><span class="text-sm mt-3 block text-on-surface-variant italic">"Even our food AI is scratching its head on this one. Try lowering the rating slider or clearing some chips!"</span>`;
+                    showSection(emptyState);
+                } else {
+                    const errorDetail = await response.json();
+                    errorStateMsg.innerHTML = `Error Code ${response.status}: Failed to retrieve recommendations.<br/><span class="text-sm mt-2 block text-[#ffb4ab]">${errorDetail.detail || 'Internal server issue'}</span>`;
+                    showSection(errorState);
+                }
+            } catch (err) {
+                console.error("Fetch recommendation failed:", err);
+                errorStateMsg.textContent = "Unable to connect to the recommendation engine. Please verify the backend is running at local port.";
+                showSection(errorState);
+            } finally {
+                setLoading(false);
+                checkApiHealth(); // Update connectivity badge
+            }
+        }
+
+        function retrySearch() {
+            performRecommendationSearch();
+        }
+
+        function setLoading(isLoading) {
+            if (isLoading) {
+                generateBtn.disabled = true;
+                btnLabel.classList.add('hidden');
+                spinner.classList.remove('hidden');
+            } else {
+                generateBtn.disabled = false;
+                btnLabel.classList.remove('hidden');
+                spinner.classList.add('hidden');
+            }
+        }
+
+        // Return a customized modern gradient header with cuisine matching icons
+        function getPremiumGradientHeader(cuisinesText, rank, matchScore) {
+            const lowerCuisines = cuisinesText.toLowerCase();
+            
+            // Choose colors based on rank
+            let bgGradient = 'from-[#1A1A1A] to-[#2A2A2A]';
+            let iconColor = 'text-primary';
+            
+            if (rank === 1) {
+                bgGradient = 'from-[#3A141A] to-[#2A2A2A]'; // Crimson hue for #1
+                iconColor = 'text-[#E23744]';
+            } else if (rank === 2) {
+                bgGradient = 'from-[#1B2735] to-[#2A2A2A]'; // Soft blue/teal hue for #2
+            }
+            
+            // Determine icon
+            let iconName = 'restaurant'; // Default
+            if (lowerCuisines.includes('cafe') || lowerCuisines.includes('coffee') || lowerCuisines.includes('beverages')) {
+                iconName = 'local_cafe';
+            } else if (lowerCuisines.includes('desserts') || lowerCuisines.includes('bakery') || lowerCuisines.includes('sweet')) {
+                iconName = 'cake';
+            } else if (lowerCuisines.includes('chinese') || lowerCuisines.includes('thai') || lowerCuisines.includes('noodle')) {
+                iconName = 'ramen_dining';
+            } else if (lowerCuisines.includes('pizza') || lowerCuisines.includes('italian')) {
+                iconName = 'local_pizza';
+            } else if (lowerCuisines.includes('burger') || lowerCuisines.includes('fast food')) {
+                iconName = 'lunch_dining';
+            } else if (lowerCuisines.includes('bar') || lowerCuisines.includes('pub') || lowerCuisines.includes('beer')) {
+                iconName = 'sports_bar';
+            }
+
+            return `
+                <div class="relative h-24 bg-gradient-to-r ${bgGradient} p-4 flex items-center justify-between border-b border-[#2D2D2D] smooth-transition">
+                    <div class="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-white/5 via-transparent to-transparent pointer-events-none"></div>
+                    <div class="flex items-center gap-3 relative z-10">
+                        <div class="w-11 h-11 rounded-xl bg-[#1E1E1E] flex items-center justify-center ${iconColor} border border-[#3D3D3D] shadow-inner">
+                            <span class="material-symbols-outlined text-2xl">${iconName}</span>
+                        </div>
+                        <div>
+                            <span class="font-label-sm text-xs text-on-surface-variant tracking-wider uppercase block">RECOMMENDED SPOT</span>
+                            <span class="font-label-sm text-xs text-primary font-semibold">${cuisinesText.split(',')[0]}</span>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-2 relative z-10">
+                        <!-- Rank Pill -->
+                        <div class="px-2.5 py-1 rounded-full ${rank === 1 ? 'zomato-red text-white' : 'bg-surface-container-high text-on-surface'} font-label-sm text-[12px] font-bold border border-outline-variant shadow flex items-center gap-0.5">
+                            <span>#${rank}</span> Match
+                        </div>
+                        
+                        <!-- Match Score Percentage Ring -->
+                        <div class="relative flex items-center justify-center w-11 h-11 rounded-full bg-black/60 border border-white/10 shadow-inner">
+                            <span class="font-label-sm text-[11px] text-white font-bold">${matchScore}%</span>
+                            <svg class="absolute inset-0 w-full h-full -rotate-90" viewBox="0 0 36 36">
+                                <path class="text-white/10" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-dasharray="100, 100" stroke-width="2.5"></path>
+                                <path class="text-[#E23744]" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-dasharray="${matchScore}, 100" stroke-width="2.5"></path>
+                            </svg>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        // Render response data to Results Grid
+        function renderRecommendations(data, params) {
+            // Update Header
+            let searchCuisineText = params.cuisine ? `, ${params.cuisine}` : '';
+            summaryTitle.textContent = `Curated for '${params.location}, ${params.budget.charAt(0).toUpperCase() + params.budget.slice(1)} Budget${searchCuisineText}, ${params.min_rating.toFixed(1)}+'`;
+            summaryText.textContent = data.summary || `Found ${data.recommendations.length} matching dining options. Here are the personalized AI curated choices ranked for your preferences.`;
+
+            // Clear previous grid items
+            recommendationGrid.innerHTML = '';
+            
+            if (data.recommendations.length === 0) {
+                emptyStateMsg.innerHTML = `Sorry :( We don't know any restaurants in <strong>${params.location}</strong> for this rating! 🍕🔍<br/><span class="text-sm mt-3 block text-on-surface-variant italic">"Even our food AI is scratching its head on this one. Try lowering the rating slider or clearing some chips!"</span>`;
+                showSection(emptyState);
+                return;
+            }
+
+            data.recommendations.forEach(rec => {
+                // Calculate match score representation (based on rank)
+                let score = 98 - (rec.rank - 1) * 6;
+                if (score < 70) score = 72; // keep it high for matching
+
+                const cardHeaderHTML = getPremiumGradientHeader(rec.cuisine, rec.rank, score);
+
+                // Check rating display
+                let ratingDisplay = rec.rating !== null ? rec.rating.toFixed(1) : 'NEW';
+                let ratingClass = 'bg-green-800 text-green-100';
+                if (ratingDisplay === 'NEW' || parseFloat(ratingDisplay) < 3.5) {
+                    ratingClass = 'bg-yellow-700 text-yellow-100';
+                }
+
+                const cardHTML = `
+                    <div class="elevation-1 rounded-xl overflow-hidden group smooth-transition hover:border-primary hover:bg-[#252525] flex flex-col h-full shadow-lg">
+                        ${cardHeaderHTML}
+                        <div class="p-5 flex flex-col gap-4 bg-[#1E1E1E] group-hover:bg-[#252525] flex-grow transition-colors duration-150">
+                            <div class="flex justify-between items-start">
+                                <div>
+                                    <h4 class="font-headline-md text-headline-md text-on-surface group-hover:text-white transition-colors duration-150">${rec.restaurant_name}</h4>
+                                    <p class="font-body-md text-label-md text-on-surface-variant mt-0.5">${rec.cuisine}</p>
+                                </div>
+                                <div class="flex flex-col items-end flex-shrink-0">
+                                    <div class="flex items-center gap-1 ${ratingClass} px-2 py-1 rounded font-label-sm font-bold shadow-sm">
+                                        <span>${ratingDisplay}</span>
+                                        <span class="material-symbols-outlined text-[14px]">star</span>
+                                    </div>
+                                    <span class="font-label-sm text-on-surface-variant mt-1.5">${rec.estimated_cost}</span>
+                                </div>
+                            </div>
+                            <!-- AI Insight Section -->
+                            <div class="mt-auto pt-2">
+                                <div class="p-3.5 rounded-lg bg-[#181818] border-l-2 border-primary relative overflow-hidden group-hover:bg-[#1E1E1E] transition-colors duration-150">
+                                    <p class="font-body-md text-label-md text-on-surface italic relative z-10 flex gap-2.5 items-start">
+                                        <span class="material-symbols-outlined text-primary text-[20px] mt-0.5 flex-shrink-0">neurology</span>
+                                        <span class="leading-relaxed">"${rec.explanation}"</span>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = cardHTML.trim();
+                recommendationGrid.appendChild(tempDiv.firstChild);
+            });
+
+            showSection(recommendationGrid);
+        }
+    </script>
+</body>
+</html>
