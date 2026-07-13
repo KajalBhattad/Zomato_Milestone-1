@@ -3,9 +3,11 @@ from contextlib import asynccontextmanager
 # pyrefly: ignore [missing-import]
 from fastapi import FastAPI, Request, status
 # pyrefly: ignore [missing-import]
-from fastapi.responses import JSONResponse, HTMLResponse
+from fastapi.responses import JSONResponse
 # pyrefly: ignore [missing-import]
 from fastapi.exceptions import RequestValidationError
+# pyrefly: ignore [missing-import]
+from fastapi.middleware.cors import CORSMiddleware
 from src.api.routes import router as api_router
 from src.data.cache import initialize_cache
 
@@ -36,6 +38,20 @@ app = FastAPI(
     lifespan=lifespan
 )
 
+# Allow cross-origin requests from the Vercel-hosted frontend.
+# Replace the placeholder URL with your actual Vercel deployment URL after deploying.
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:3000",          # Local development
+        "http://localhost:5500",          # Live Server (VS Code)
+        "https://your-app.vercel.app",   # TODO: Replace with your actual Vercel URL
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 # Custom handler to translate Pydantic/FastAPI validation exceptions to 400 Bad Requests
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
@@ -48,19 +64,14 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 # Include API endpoints router
 app.include_router(api_router, prefix="/api/v1")
 
-@app.get("/", response_class=HTMLResponse)
-def read_index():
+@app.get("/")
+def read_root():
     """
-    Serves the user-facing HTML recommendation dashboard.
+    Root health/info endpoint. Frontend is served separately on Vercel.
     """
-    import os
-    static_file_path = os.path.join(os.path.dirname(__file__), "static", "index.html")
-    try:
-        with open(static_file_path, "r", encoding="utf-8") as f:
-            return HTMLResponse(content=f.read())
-    except FileNotFoundError:
-        return HTMLResponse(
-            content="<h1>Zomato AI Dashboard under construction</h1><p>Please check backend static file setup.</p>",
-            status_code=status.HTTP_503_SERVICE_UNAVAILABLE
-        )
-
+    return {
+        "service": "Zomato Restaurant Recommendation API",
+        "version": "1.0.0",
+        "docs": "/docs",
+        "health": "/api/v1/health",
+    }

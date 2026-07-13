@@ -364,6 +364,13 @@
 
     <!-- JavaScript logic -->
     <script>
+        // ---------------------------------------------------------------------------
+        // API Configuration
+        // Set API_BASE to your Railway URL for production, or leave empty for local.
+        // Example: const API_BASE = "https://zomato-milestone1.up.railway.app";
+        // ---------------------------------------------------------------------------
+        const API_BASE = ""; // TODO: Replace with your Railway URL before deploying to Vercel
+
         // Bengaluru locations list extracted from dataset
         const locations = [
             'BTM', 'Banashankari', 'Banaswadi', 'Bannerghatta Road', 'Basavanagudi', 
@@ -463,7 +470,7 @@
         // Check backend health
         async function checkApiHealth() {
             try {
-                const response = await fetch('/api/v1/health');
+                const response = await fetch(`${API_BASE}/api/v1/health`);
                 const data = await response.json();
                 
                 if (data.status === 'healthy') {
@@ -668,7 +675,7 @@
             };
 
             try {
-                const response = await fetch('/api/v1/recommend', {
+                const response = await fetch(`${API_BASE}/api/v1/recommend`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
