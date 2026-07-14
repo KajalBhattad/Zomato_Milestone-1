@@ -114,7 +114,7 @@ def preprocess_row(row: Dict[str, Any]) -> Optional[Restaurant]:
         rating_text=rating_text,
         cost_for_two=cost_for_two,
         budget_tier=budget_tier,
-        raw=row
+        dish_liked=str(row.get("dish_liked")).strip() if row.get("dish_liked") else None
     )
 
 def preprocess_dataset(raw_dataset: List[Dict[str, Any]]) -> List[Restaurant]:

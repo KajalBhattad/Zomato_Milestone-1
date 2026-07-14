@@ -21,5 +21,11 @@ htmlcov/
 
 # OS
 .DS_Store
-data/restaurants.parquet
+
+# data/restaurants.parquet is intentionally NOT gitignored.
+# The nixpacks.toml build step downloads it during image build (baked into the
+# container), so every container restart reads from the fast local path.
+# If the file is present locally you may commit it (it's 142 MB; use git-lfs
+# for that), or simply rely on the build step to generate it on Railway.
+
 

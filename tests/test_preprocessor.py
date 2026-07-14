@@ -75,7 +75,20 @@ def test_preprocess_row_valid():
     assert restaurant.cost_for_two == 800
     assert restaurant.budget_tier == "medium"
     assert restaurant.id is not None
-    assert restaurant.raw == row
+    # raw is no longer stored; only dish_liked is extracted
+    assert restaurant.dish_liked is None
+
+def test_preprocess_row_extracts_dish_liked():
+    """dish_liked from the raw row is preserved on the Restaurant object."""
+    row = {
+        "name": "Meghana Foods",
+        "location": "Koramangala",
+        "rate": "4.5/5",
+        "dish_liked": "Biryani, Chicken Kebab",
+    }
+    restaurant = preprocess_row(row)
+    assert restaurant is not None
+    assert restaurant.dish_liked == "Biryani, Chicken Kebab"
 
 def test_preprocess_row_skips_on_missing_critical():
     # Missing name

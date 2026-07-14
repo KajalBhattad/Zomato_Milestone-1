@@ -1,0 +1,19 @@
+# nixpacks.toml — Railway build configuration
+#
+# nixpacks auto-detects Python and runs pip install automatically.
+# We only override:
+#   [phases.build] — runs download_dataset.py AFTER pip install, BEFORE container
+#                    export, baking data/restaurants.parquet into the image so
+#                    every container restart reads from disk (< 1s) rather than
+#                    downloading 142 MB from HuggingFace on each startup.
+#   [start]        — the uvicorn start command.
+#
+# NOTE: Do NOT add [phases.install] here — overriding it causes nixpacks to drop
+#       the venv activation wrapper it generates, which breaks the build phase PATH.
+
+[phases.build]
+cmds = ["python scripts/download_dataset.py"]
+dependsOn = ["install"]
+
+[start]
+cmd = "uvicorn src.main:app --host 0.0.0.0 --port $PORT"

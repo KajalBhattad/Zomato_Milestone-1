@@ -62,7 +62,7 @@ def build_prompt(
             "cost_for_two": r.cost_for_two,
             "budget_tier": r.budget_tier,
             # If available, we could pass dish_liked or other tags to assist with additional preferences reasoning
-            "dish_liked": r.raw.get("dish_liked") if r.raw else None
+            "dish_liked": r.dish_liked
         })
         
     candidates_json = json.dumps(minimal_candidates, indent=2)

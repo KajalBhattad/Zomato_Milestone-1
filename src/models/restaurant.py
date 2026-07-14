@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Optional
+from typing import List, Optional
 # pyrefly: ignore [missing-import]
 from pydantic import BaseModel, Field
 
@@ -11,5 +11,6 @@ class Restaurant(BaseModel):
     rating_text: str = Field(default="Unrated", description="Display text for rating, e.g., '4.1', 'NEW', 'Unrated'")
     cost_for_two: Optional[int] = Field(default=None, description="Estimated cost for two people in INR")
     budget_tier: str = Field(description="Budget tier: low, medium, or high")
-    raw: Optional[Dict[str, Any]] = Field(default=None, description="Original raw record for debugging")
+    dish_liked: Optional[str] = Field(default=None, description="Comma-separated popular dishes (from 'dish_liked' column)")
+
 
