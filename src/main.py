@@ -4,7 +4,7 @@ from contextlib import asynccontextmanager
 # pyrefly: ignore [missing-import]
 from fastapi import FastAPI, Request, status
 # pyrefly: ignore [missing-import]
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, FileResponse
 # pyrefly: ignore [missing-import]
 from fastapi.exceptions import RequestValidationError
 # pyrefly: ignore [missing-import]
@@ -77,14 +77,9 @@ async def validation_exception_handler(request: Request, exc: RequestValidationE
 # Include API endpoints router
 app.include_router(api_router, prefix="/api/v1")
 
-@app.get("/")
+@app.get("/", response_class=FileResponse)
 def read_root():
     """
-    Root health/info endpoint. Frontend is served separately on Vercel.
+    Serves the static frontend HTML dashboard.
     """
-    return {
-        "service": "Zomato Restaurant Recommendation API",
-        "version": "1.0.0",
-        "docs": "/docs",
-        "health": "/api/v1/health",
-    }
+    return FileResponse("src/static/index.html")

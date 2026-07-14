@@ -50,14 +50,20 @@ def load_raw_dataset() -> Any:
             logger.warning(f"'train' split not found. Using '{split}' split instead.")
         raw_rows = dataset[split]
         
-        # Save a copy locally for future runs
+        # Save a copy locally for future runs, then load from parquet to free
+        # the HF Dataset from memory before preprocessing (prevents OOM on Railway).
         try:
             logger.info(f"Saving a local Parquet copy to '{parquet_path}'...")
             save_dataset_to_parquet(raw_rows, parquet_path)
+            # Release the HF Dataset object and return the lighter parquet-backed list
+            del raw_rows
+            logger.info(f"Loading dataset back from saved Parquet: '{parquet_path}'")
+            df = pd.read_parquet(parquet_path)
+            df = df.where(pd.notnull(df), None)
+            return df.to_dict(orient="records")
         except Exception as save_err:
-            logger.warning(f"Could not save local Parquet backup: {save_err}")
-            
-        return raw_rows
+            logger.warning(f"Could not save local Parquet backup: {save_err}. Using in-memory dataset.")
+            return list(raw_rows)
     except Exception as e:
         logger.error(f"Failed to load dataset '{dataset_name}' from Hugging Face: {e}")
         raise e
