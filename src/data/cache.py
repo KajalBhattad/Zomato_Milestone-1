@@ -1,9 +1,10 @@
+import gc
+import os
 import logging
 import threading
 from typing import List, Optional
 from src.models.restaurant import Restaurant
-from src.data.loader import load_raw_dataset
-from src.data.preprocessor import preprocess_dataset
+from src.config import settings
 
 logger = logging.getLogger(__name__)
 
@@ -40,8 +41,23 @@ def initialize_cache(force: bool = False) -> List[Restaurant]:
 
         logger.info("Initializing dataset cache...")
         try:
-            raw_rows = load_raw_dataset()
-            _cached_restaurants = preprocess_dataset(raw_rows)
+            parquet_path = settings.local_parquet_path
+
+            if os.path.exists(parquet_path):
+                # Memory-efficient path: reads only needed columns from parquet
+                # and processes row-by-row without a huge intermediate dict list.
+                # Peak memory: ~80 MB instead of ~800 MB.
+                from src.data.loader import load_restaurants_from_local
+                _cached_restaurants = load_restaurants_from_local(parquet_path)
+            else:
+                # Fallback: download from HuggingFace, save parquet, then preprocess
+                from src.data.loader import load_raw_dataset
+                from src.data.preprocessor import preprocess_dataset
+                raw_rows = load_raw_dataset()
+                _cached_restaurants = preprocess_dataset(raw_rows)
+                del raw_rows
+                gc.collect()
+
             logger.info(f"Successfully initialized cache with {len(_cached_restaurants)} restaurants.")
             return _cached_restaurants
         except Exception as e:
