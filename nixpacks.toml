@@ -11,9 +11,5 @@
 # NOTE: Do NOT add [phases.install] here — overriding it causes nixpacks to drop
 #       the venv activation wrapper it generates, which breaks the build phase PATH.
 
-[phases.build]
-cmds = ["python scripts/download_dataset.py"]
-dependsOn = ["install"]
-
 [start]
 cmd = "uvicorn src.main:app --host 0.0.0.0 --port $PORT"
