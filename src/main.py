@@ -53,16 +53,14 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-# Allow cross-origin requests from the Vercel-hosted frontend.
-# Replace the placeholder URL with your actual Vercel deployment URL after deploying.
+# Allow cross-origin requests from any origin during initial deployment.
+# IMPORTANT: After deploying to Vercel, replace ["*"] with your actual Vercel URL,
+# e.g. allow_origins=["https://zomato-milestone1.vercel.app"]
+# This follows Step 1a → Step 4 of the deployment plan.
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",          # Local development
-        "http://localhost:5500",          # Live Server (VS Code)
-        "https://your-app.vercel.app",   # TODO: Replace with your actual Vercel URL
-    ],
-    allow_credentials=True,
+    allow_origins=["*"],  # TODO (Step 4): Lock down to your Vercel URL after frontend is deployed
+    allow_credentials=False,  # Must be False when allow_origins=["*"]
     allow_methods=["*"],
     allow_headers=["*"],
 )

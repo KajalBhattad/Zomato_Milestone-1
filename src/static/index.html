@@ -365,11 +365,16 @@
     <!-- JavaScript logic -->
     <script>
         // ---------------------------------------------------------------------------
-        // API Configuration
-        // Set API_BASE to your Railway URL for production, or leave empty for local.
-        // Example: const API_BASE = "https://zomato-milestone1.up.railway.app";
+        // API Configuration (Deployment Plan — Step 2a & Step 4)
+        //
+        // LOCAL DEV:   Leave API_BASE as "" (FastAPI serves both frontend and API on same origin)
+        // PRODUCTION:  After deploying backend to Railway (Step 3), copy the Railway URL here,
+        //              then commit and push before deploying to Vercel (Step 4).
+        //
+        // Example:
+        //   const API_BASE = "https://zomato-milestone1.up.railway.app";
         // ---------------------------------------------------------------------------
-        const API_BASE = ""; // TODO: Replace with your Railway URL before deploying to Vercel
+        const API_BASE = ""; // ← STEP 2a: Replace with your Railway URL before Vercel deploy
 
         // Bengaluru locations list extracted from dataset
         const locations = [
