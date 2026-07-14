@@ -12,6 +12,13 @@ import logging
 import sys
 import os
 
+# Ensure the project root (parent of this scripts/ directory) is on sys.path
+# so that `from src.data.loader import ...` resolves when this script is run
+# directly as `python scripts/download_dataset.py` during the nixpacks build.
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if PROJECT_ROOT not in sys.path:
+    sys.path.insert(0, PROJECT_ROOT)
+
 logging.basicConfig(
     level=logging.INFO,
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
